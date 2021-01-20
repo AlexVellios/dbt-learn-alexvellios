@@ -1,5 +1,21 @@
 version: 2
 
+sources:
+  - name: jaffle_shop
+    database: raw
+    tables:
+      - name: customers
+      - name: orders
+        loaded_at_field: _etl_loaded_at
+        freshness:
+          warn_after: {count: 12, period: hour}
+          error_after: {count: 24, period: hour}
+  
+  - name: stripe
+    database: raw
+    tables:
+      - name: payment
+
 models:
   - name: customers
     description: One record per customer
@@ -33,3 +49,11 @@ models:
         tests:
           - accepted_values:
               values: ['placed', 'shipped', 'completed', 'return_pending', 'returned']
+
+  - name: stg_customervalue
+    description: This model cleans up order data
+    columns:
+      - name: customer_id
+        description: Secondary key
+        tests:
+          - not_null
