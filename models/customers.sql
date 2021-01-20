@@ -10,6 +10,12 @@ orders as (
 
 ),
 
+customervalue as (
+
+    select * from {{ ref('stg_customervalue') }}
+
+),
+
 customer_orders as (
 
     select
@@ -26,7 +32,7 @@ customer_orders as (
 ),
 
 
-final as (
+final_0 as (
 
     select
         customers.customer_id,
@@ -39,6 +45,23 @@ final as (
     from customers
 
     left join customer_orders using (customer_id)
+
+),
+
+final as (
+
+    select
+        final_0.customer_id,
+        final_0.first_name,
+        final_0.last_name,
+        final_0.first_order_date,
+        final_0.most_recent_order_date,
+        final_0.number_of_orders,
+        customervalue.amount as lifetime_value
+
+    from final_0
+
+    left join customervalue using (customer_id)
 
 )
 
