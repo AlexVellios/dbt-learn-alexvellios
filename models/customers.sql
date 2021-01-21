@@ -10,10 +10,19 @@ orders as (
 
 ),
 
+payments as (
+
+    select * from {{ ref('stg_payment') }}
+
+),
+
 customervalue as (
-
-    select * from {{ ref('stg_customervalue') }}
-
+select 
+    orders.customer_id as customer_id,
+    sum(payments.amount)/100 as amount
+from orders
+left join payments using (order_id)
+group by customer_id
 ),
 
 customer_orders as (
